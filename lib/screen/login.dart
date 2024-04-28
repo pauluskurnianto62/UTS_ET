@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:myproject/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class MyLogin extends StatelessWidget {
+  const MyLogin({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,12 +12,14 @@ class MyLogin extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Login(),
+      home: const Login(),
     );
   }
 }
 
 class Login extends StatefulWidget {
+  const Login({super.key});
+
   @override
   State<StatefulWidget> createState() {
     return _LoginState();
@@ -32,35 +35,36 @@ class _LoginState extends State<Login> {
     prefs.setString("user_name", _user_name);
     main();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: Container(
-        height: 300,
-        margin: EdgeInsets.all(20),
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(30)),
-          border: Border.all(width: 1),
-          color: Colors.white,
-          boxShadow: [BoxShadow(blurRadius: 20)]),
-          child: Column(children: [		Padding(
-              padding: EdgeInsets.all(10),
+        appBar: AppBar(
+          title: const Text('Login'),
+        ),
+        body: Container(
+          height: 300,
+          margin: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(30)),
+              border: Border.all(width: 1),
+              color: Colors.white,
+              boxShadow: const [BoxShadow(blurRadius: 20)]),
+          child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.all(10),
               child: TextField(
                 onChanged: (v) {
                   _user_name = v;
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Username',
                     hintText: 'Enter username'),
               ),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(10),
               //padding: EdgeInsets.symmetric(horizontal: 15),
               child: TextField(
@@ -72,7 +76,7 @@ class _LoginState extends State<Login> {
               ),
             ),
             Padding(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Container(
                   height: 50,
                   width: 300,
@@ -80,15 +84,16 @@ class _LoginState extends State<Login> {
                       color: Colors.blue,
                       borderRadius: BorderRadius.circular(20)),
                   child: ElevatedButton(
-                    onPressed: () {doLogin();},
-                    child: Text(
+                    onPressed: () {
+                      doLogin();
+                    },
+                    child: const Text(
                       'Login',
                       style: TextStyle(color: Colors.black, fontSize: 25),
                     ),
                   ),
                 )),
-		      ]),
-   ));
-   
+          ]),
+        ));
   }
 }
