@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class About extends StatelessWidget {
+class Highscore extends StatelessWidget {
 
  @override
  Widget build(BuildContext context) {
