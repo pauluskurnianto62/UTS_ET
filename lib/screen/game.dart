@@ -7,14 +7,13 @@ import 'package:myproject/screen/result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<String> checkUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString("user_name") ?? '';
-    return username;
-  }
+  final prefs = await SharedPreferences.getInstance();
+  String username = prefs.getString("user_name") ?? '';
+  return username;
+}
 
 class GamePage extends StatefulWidget {
-  GamePage({super.key});
-
+  const GamePage({super.key});
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -33,6 +32,7 @@ class _GamePageState extends State<GamePage> {
   List<int> imagesImagePick = [];
   List<int> imagesImageAnswer = [];
   List<int> imagesImageUserAnswer = [];
+  Timer? timerAnimate;
   Timer? timer;
   String username = "";
 
@@ -42,12 +42,6 @@ class _GamePageState extends State<GamePage> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(milliseconds: 1000), (timer) {
-      setState(() {
-        animated = !animated;
-        opacityLevel = 1-opacityLevel;
-      });
-    });
     for (int i = 1; i <= 20; i++) {
       images.add(['c-$i-1.png', 'c-$i-2.png', 'c-$i-3.png', 'c-$i-4.png']);
     }
@@ -69,6 +63,13 @@ class _GamePageState extends State<GamePage> {
         timer?.cancel();
         state = "REMEMBER";
         showRandomImage();
+        timerAnimate =
+            Timer.periodic(const Duration(milliseconds: 500), (timer) {
+          setState(() {
+            animated = !animated;
+            opacityLevel = 1 - opacityLevel;
+          });
+        });
         timer = Timer.periodic(
             const Duration(seconds: 3), (timer) => showRandomImage());
         return;
@@ -121,23 +122,43 @@ class _GamePageState extends State<GamePage> {
     if (imagesImageUserAnswer.length >= imagesImageAnswer.length) {
       //state = "COMPLETE";
       saveScore();
+      Navigator.pop(context);
       if (score == 5) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Result(score, "Maestro dell'Indovinello (Master of Riddles)")));
-      }
-      else if (score == 4) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Result(score, "Esperto dell'Indovinello (Expert of Riddles)")));
-      }
-      else if (score == 3) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Result(score, "Abile Indovinatore (Skillful Guesser)")));
-      }
-      else if (score == 2) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Result(score, "Principiante dell'Indovinello (Riddle Beginner)")));
-      }
-      else if (score == 1) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Result(score, "Neofita dell'Indovinello (Riddle Novice)")));
-      }
-      else if (score == 0) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Result(score, "Sfortunato Indovinatore (Unlucky Guesser)")));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Result(
+                    score, "Maestro dell'Indovinello (Master of Riddles)")));
+      } else if (score == 4) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Result(
+                    score, "Esperto dell'Indovinello (Expert of Riddles)")));
+      } else if (score == 3) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    Result(score, "Abile Indovinatore (Skillful Guesser)")));
+      } else if (score == 2) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Result(
+                    score, "Principiante dell'Indovinello (Riddle Beginner)")));
+      } else if (score == 1) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    Result(score, "Neofita dell'Indovinello (Riddle Novice)")));
+      } else if (score == 0) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Result(
+                    score, "Sfortunato Indovinatore (Unlucky Guesser)")));
       }
       state = "COMPLETE";
       return;
@@ -146,13 +167,11 @@ class _GamePageState extends State<GamePage> {
     setState(() {});
   }
 
-  void time(){
-
-     timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+  void time() {
+    timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       setState(() {
         timeleft--;
-        if(timeleft==0)
-        {
+        if (timeleft == 0) {
           //_question_no++;
           //if(_question_no>_questions.length - 6) finishQuiz();
           //_hitung=_maxtime;
@@ -163,9 +182,10 @@ class _GamePageState extends State<GamePage> {
 
   void saveScore() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString("my_username", username);
-    prefs.setInt("my_score", score);
-    main();
+    String? username = prefs.getString("user_name");
+    if (username != null) {
+      prefs.setInt("score_$username", score);
+    }
   }
 
   @override
@@ -201,13 +221,11 @@ class _GamePageState extends State<GamePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       AnimatedOpacity(
-                        opacity: opacityLevel,
-                        duration: const Duration(seconds: 1),
-                        child:
-                          Image.asset('assets/$imageUrl')
-                      ),
+                          opacity: opacityLevel,
+                          duration: const Duration(seconds: 1),
+                          child: Image.asset('assets/$imageUrl')),
                       //Image.asset(
-                        //'assets/$imageUrl',
+                      //'assets/$imageUrl',
                       //),
                       Text('${imagesImagePick.length} of $maxPick'),
                     ],
@@ -235,7 +253,9 @@ class _GamePageState extends State<GamePage> {
                                           : null
                                       : null,
                                   child: Image.asset(
-                                    'assets/${images[imagesImagePick[imagesImageUserAnswer.length]][0]}', width: 240, height: 240,
+                                    'assets/${images[imagesImagePick[imagesImageUserAnswer.length]][0]}',
+                                    width: 240,
+                                    height: 240,
                                   ),
                                 ),
                               ),
@@ -254,7 +274,9 @@ class _GamePageState extends State<GamePage> {
                                           : null
                                       : null,
                                   child: Image.asset(
-                                    'assets/${images[imagesImagePick[imagesImageUserAnswer.length]][1]}', width: 240, height: 240,
+                                    'assets/${images[imagesImagePick[imagesImageUserAnswer.length]][1]}',
+                                    width: 240,
+                                    height: 240,
                                   ),
                                 ),
                               ),
@@ -278,7 +300,9 @@ class _GamePageState extends State<GamePage> {
                                           : null
                                       : null,
                                   child: Image.asset(
-                                    'assets/${images[imagesImagePick[imagesImageUserAnswer.length]][2]}', width: 240, height: 240,
+                                    'assets/${images[imagesImagePick[imagesImageUserAnswer.length]][2]}',
+                                    width: 240,
+                                    height: 240,
                                   ),
                                 ),
                               ),
@@ -297,23 +321,23 @@ class _GamePageState extends State<GamePage> {
                                           : null
                                       : null,
                                   child: Image.asset(
-                                    'assets/${images[imagesImagePick[imagesImageUserAnswer.length]][3]}', width: 240, height: 240,
+                                    'assets/${images[imagesImagePick[imagesImageUserAnswer.length]][3]}',
+                                    width: 240,
+                                    height: 240,
                                   ),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        Text(
-                            '${imagesImageUserAnswer.length + 1} of $maxPick'),
+                        Text('${imagesImageUserAnswer.length + 1} of $maxPick'),
                         if (isCorrect != null && isCorrect!)
                           Text(
                             'Your answer is correct\nYour score now is $score',
                             style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
-                        if (isCorrect != null &&
-                            isCorrect! == false)
+                        if (isCorrect != null && isCorrect! == false)
                           Text(
                               'Your answer is wrong!\nYour score now is $score',
                               style: const TextStyle(
